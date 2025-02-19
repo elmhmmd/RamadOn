@@ -10,4 +10,10 @@ class Recette extends Model
     use HasFactory;
 
     protected $fillable = ['name', 'content', 'image'];
+
+    public function category()
+    
+    {
+        return $this->belongsTo(Category::class);
+    }
 }
