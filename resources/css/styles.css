@@ -1,0 +1,52 @@
+:root {
+    --color-olive: #2C3315;
+    --color-gold: #D4B363;
+    --color-light-gold: #E5C785;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+.font-display {
+    font-family: 'Playfair Display', serif;
+}
+
+.bg-olive {
+    background-color: var(--color-olive);
+}
+
+.text-gold {
+    color: var(--color-gold);
+}
+
+.text-light-gold {
+    color: var(--color-light-gold);
+}
+
+.border-gold {
+    border-color: var(--color-gold);
+}
+
+.gold-glow {
+    text-shadow: 0 0 15px rgba(212, 179, 99, 0.4);
+}
+
+.nav-link {
+    position: relative;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background: var(--color-gold);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}

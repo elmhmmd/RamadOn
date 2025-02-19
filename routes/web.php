@@ -1,7 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RecetteController;
+
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('Homepage');
 });
+
+Route::get('/recettes', [RecetteController::class, 'index'])->name('recettes.index');
+
+Route::get('/temoignages', [TemoignagesController::class, 'index'])->name('temoignages.index');
+
+
+
