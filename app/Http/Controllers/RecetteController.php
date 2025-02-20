@@ -16,6 +16,17 @@ class RecetteController extends Controller
         return view('recettes.index', compact('categories', 'recettes'));
     }
 
+    public function show($id)
+    {
+        $recette = Recette::find($id);
+
+        if (!$recette) {
+            return abort(404, 'Recette non trouvée');
+        }
+
+        return view('recettes.show', compact('recette'));
+    }
+
     public function destroy(Recette $recette)
     {
         try {

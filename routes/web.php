@@ -14,5 +14,7 @@ Route::get('/temoignages', [TemoignagesController::class, 'index'])->name('temoi
 
 Route::delete('/recettes/{recette}', [RecetteController::class, 'destroy'])->name('recettes.destroy');
 
+Route::get('/recettes/{id}', [RecetteController::class, 'show'])->name('recettes.show');
+
 
 
