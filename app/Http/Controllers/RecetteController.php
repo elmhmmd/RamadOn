@@ -16,36 +16,35 @@ class RecetteController extends Controller
         return view('recettes.index', compact('categories', 'recettes'));
     }
 
-    public function show($id)
-    {
-        $recette = Recette::find($id);
-
-        if (!$recette) {
-            return abort(404, 'Recette non trouvée');
-        }
-
-        return view('recettes.show', compact('recette'));
-    }
-
-    public function destroy(Recette $recette)
+    public function destroy($id)
     {
         try {
+            $recette = Recette::find($id);
+
             $recette->delete();
-            return response()->json(['message' => 'Recette supprimée avec succès']);
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Recette supprimée avec succès'
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Erreur lors de la suppression'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur lors de la suppression: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    /*public function show($id)
-    {
-        try {
-            $recette = Recette::with('category')->findOrFail($id);
-            return response()->json($recette);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Recipe not found'], 404);
-        }
+    public function show($id)
+{
+    try {
+        $recette = Recette::with('category')->findOrFail($id);
+        return view('recettes.show', compact('recette'));
+    } catch (\Exception $e) {
+        abort(404, 'Recette not found');
     }
+}
+
 }
 
     /*public function update(Request $request, $id)
@@ -74,4 +73,4 @@ class RecetteController extends Controller
 
     return response()->json(['message' => 'Recipe updated successfully']);
 }*/
-}
+

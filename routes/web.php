@@ -12,9 +12,11 @@ Route::get('/recettes', [RecetteController::class, 'index'])->name('recettes.ind
 
 Route::get('/temoignages', [TemoignagesController::class, 'index'])->name('temoignages.index');
 
-Route::delete('/recettes/{recette}', [RecetteController::class, 'destroy'])->name('recettes.destroy');
-
 Route::get('/recettes/{id}', [RecetteController::class, 'show'])->name('recettes.show');
+
+Route::delete('/recettes/{id}', [RecetteController::class, 'destroy'])->name('recettes.destroy');
+
+Route::post('/recettes', [RecetteController::class, 'store'])->name('recettes.store');
 
 
 
