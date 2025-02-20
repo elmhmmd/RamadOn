@@ -58,6 +58,19 @@
         .recipe-card.hidden {
             display: none;
         }
+        .golden-button {
+            background: linear-gradient(135deg, #D4B363 0%, #F2D795 50%, #D4B363 100%);
+            box-shadow: 0 4px 15px rgba(212, 179, 99, 0.3),
+                       0 0 5px rgba(212, 179, 99, 0.5);
+            border: 1px solid rgba(212, 179, 99, 0.6);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .golden-button:hover {
+            background: linear-gradient(135deg, #E5C785 0%, #F2D795 50%, #E5C785 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(212, 179, 99, 0.4),
+                       0 0 10px rgba(212, 179, 99, 0.6);
+        }
     </style>
 </head>
 <body class="bg-olive min-h-screen">
@@ -76,23 +89,27 @@
     <main class="container mx-auto px-6 py-12">
         <h1 class="text-4xl font-display text-gold text-center mb-12 gold-glow">Nos Recettes du Ramadan</h1>
         
-        <div class="flex flex-col items-center mb-12">
-            <!-- Category Filter -->
-            <div class="flex justify-center mb-6 space-x-4 flex-wrap">
-                <button type="button" class="category-filter active px-6 py-2 rounded-full border" data-category="all">
-                    Toutes les recettes
-                </button>
-                @foreach($categories as $category)
-                <button type="button" class="category-filter px-6 py-2 rounded-full border" data-category="{{ $category->name }}">
-                    {{ $category->name }}
-                </button>
-                @endforeach
-            </div>
+        <div class="mb-12">
+            <!-- Category and Add Button Container -->
+            <div class="flex justify-between items-center flex-wrap gap-4">
+                <!-- Category Filter -->
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" class="category-filter active px-6 py-2 rounded-full border" data-category="all">
+                        Toutes les recettes
+                    </button>
+                    @foreach($categories as $category)
+                    <button type="button" class="category-filter px-6 py-2 rounded-full border" data-category="{{ $category->name }}">
+                        {{ $category->name }}
+                    </button>
+                    @endforeach
+                </div>
 
-            <!-- Add Recipe Button -->
-            <button id="addRecipeBtn" class="px-6 py-2 bg-gold text-olive rounded-full hover:bg-light-gold transition-all flex items-center">
-                <i class="fas fa-plus mr-2"></i> Ajouter une recette
-            </button>
+                <!-- Add Recipe Button -->
+                <button id="addRecipeBtn" class="golden-button px-8 py-3 text-olive rounded-full transition-all flex items-center gap-3 font-semibold tracking-wide">
+                    <i class="fas fa-plus text-sm bg-white/20 p-1 rounded-full"></i>
+                    <span>Ajouter une recette</span>
+                </button>
+            </div>
         </div>
         
         <!-- Recipe Grid -->
@@ -151,38 +168,58 @@
     <!-- Add/Edit Recipe Modal -->
     <div id="editRecipeModal" class="modal">
         <div class="modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="font-display text-gold text-2xl" id="editModalTitle">Ajouter une recette</h2>
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-display text-gold text-3xl gold-glow" id="editModalTitle">Ajouter une recette</h2>
                 <button class="close-modal text-gold hover:text-light-gold">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="recipeForm" class="space-y-6">
+            <form id="recipeForm" class="space-y-8">
                 @csrf
                 <input type="hidden" id="recipeId" name="id">
-                <div>
-                    <label for="recipeName" class="block text-light-gold mb-2">Titre</label>
-                    <input type="text" id="recipeName" name="name" class="w-full p-2 rounded bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required>
+                
+                <!-- Image Upload -->
+                <div class="space-y-2">
+                    <label class="block text-light-gold">Image de la recette</label>
+                    <div class="relative">
+                        <input type="file" id="recipeImage" name="image" accept="image/*" 
+                               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <div class="border-2 border-dashed border-gold/30 rounded-lg p-8 text-center hover:border-gold/60 transition-colors">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-gold mb-2"></i>
+                            <p class="text-light-gold">Glissez une image ou cliquez pour sélectionner</p>
+                            <p class="text-gold/60 text-sm mt-2" id="selectedFileName">Aucun fichier sélectionné</p>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label for="recipeCategory" class="block text-light-gold mb-2">Catégorie</label>
-                    <select id="recipeCategory" name="category_id" class="w-full p-2 rounded bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required>
-                        @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                        @endforeach
-                    </select>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="recipeName" class="block text-light-gold mb-2">Titre</label>
+                        <input type="text" id="recipeName" name="name" 
+                               class="w-full p-3 rounded-lg bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label for="recipeCategory" class="block text-light-gold mb-2">Catégorie</label>
+                        <select id="recipeCategory" name="category_id" 
+                                class="w-full p-3 rounded-lg bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required>
+                            @foreach($categories as $category)
+                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
+
                 <div>
-                    <label for="recipeIngredients" class="block text-light-gold mb-2">Ingrédients (un par ligne)</label>
-                    <textarea id="recipeIngredients" name="ingredients" rows="5" class="w-full p-2 rounded bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required></textarea>
+                    <label for="recipeContent" class="block text-light-gold mb-2">Contenu de la recette</label>
+                    <textarea id="recipeContent" name="content" rows="12" 
+                              class="w-full p-3 rounded-lg bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none font-normal" 
+                              placeholder="Décrivez votre recette ici..." required></textarea>
                 </div>
-                <div>
-                    <label for="recipeContent" class="block text-light-gold mb-2">Instructions</label>
-                    <textarea id="recipeContent" name="content" rows="8" class="w-full p-2 rounded bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" required></textarea>
-                </div>
-                <div class="flex justify-end">
-                    <button type="submit" class="px-6 py-2 bg-gold text-olive rounded hover:bg-light-gold transition-all">
-                        Enregistrer
+
+                <div class="flex justify-end pt-4">
+                    <button type="submit" class="golden-button px-8 py-3 text-olive rounded-full transition-all flex items-center gap-2 font-semibold tracking-wide">
+                        <i class="fas fa-save"></i>
+                        <span>Enregistrer</span>
                     </button>
                 </div>
             </form>
@@ -320,29 +357,80 @@
                 });
             });
 
-            // Edit Recipe
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const recipeId = e.target.closest('.recipe-card').dataset.id;
-                    
-                    fetch(`/api/recettes/${recipeId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('editModalTitle').textContent = 'Modifier la recette';
-                            document.getElementById('recipeId').value = data.id;
-                            document.getElementById('recipeName').value = data.name;
-                            document.getElementById('recipeCategory').value = data.category_id;
-                            document.getElementById('recipeIngredients').value = data.ingredients;
-                            document.getElementById('recipeContent').value = data.content;
-                            editRecipeModal.style.display = 'block';
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Erreur lors du chargement de la recette');
-                        });
-                });
+            // Inside the DOMContentLoaded event listener
+// Handle delete button clicks
+document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const recipeCard = this.closest('.recipe-card');
+        const recipeId = recipeCard.dataset.id;
+        
+        // Show confirmation modal
+        document.getElementById('confirmModal').style.display = 'block';
+        
+        // Setup confirm delete button
+        document.getElementById('confirmDelete').onclick = function() {
+            fetch(`/api/recettes/${recipeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erreur de suppression');
+                return response.json();
+            })
+            .then(data => {
+                // Remove the recipe card from the DOM
+                recipeCard.remove();
+                // Hide the confirmation modal
+                document.getElementById('confirmModal').style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors de la suppression de la recette');
             });
+        };
+        
+        // Setup cancel button
+        document.getElementById('cancelDelete').onclick = function() {
+            document.getElementById('confirmModal').style.display = 'none';
+        };
+    });
+});
+// Edit Recipe
+document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const recipeId = e.target.closest('.recipe-card').dataset.id;
+        
+        fetch(`/api/recettes/${recipeId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Update modal title
+                document.getElementById('editModalTitle').textContent = 'Modifier la recette';
+                
+                // Fill form with existing data
+                document.getElementById('recipeId').value = data.id;
+                document.getElementById('recipeName').value = data.name;
+                document.getElementById('recipeCategory').value = data.category_id;
+                document.getElementById('recipeContent').value = data.content;
+                
+                // Reset file input display
+                document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                
+                // Show the modal
+                editRecipeModal.style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Erreur lors du chargement de la recette');
+            });
+    });
+});
 
             // Add Recipe
             addRecipeBtn.addEventListener('click', () => {
@@ -352,33 +440,60 @@
                 editRecipeModal.style.display = 'block';
             });
 
-            // Form Submit (Add/Edit)
-            document.getElementById('recipeForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                const isEditing = formData.get('id');
-                const url = isEditing ? `/api/recettes/${formData.get('id')}` : '/api/recettes';
-                const method = isEditing ? 'PUT' : 'POST';
+           // Inside the DOMContentLoaded event listener
 
-                fetch(url, {
-                    method: method,
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) throw new Error('Erreur lors de l\'enregistrement');
-                    return response.json();
-                })
-                .then(() => {
-                    window.location.reload();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Erreur lors de l\'enregistrement de la recette');
-                });
+document.getElementById('recipeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const recipeId = formData.get('id');
+    
+    // Determine if we're editing or creating
+    const isEditing = recipeId !== '';
+    const url = isEditing ? `/api/recettes/${recipeId}` : '/api/recettes';
+    const method = isEditing ? 'POST' : 'POST'; // Using POST with _method field for PUT
+    
+    // Add _method field for PUT if editing
+    if (isEditing) {
+        formData.append('_method', 'PUT');
+    }
+    
+    // Don't send empty file input when editing
+    if (isEditing && !formData.get('image').size) {
+        formData.delete('image');
+    }
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Erreur de sauvegarde');
+        return response.json();
+    })
+    .then(() => {
+        // Reload page to show updated data
+        window.location.reload();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur lors de l\'enregistrement de la recette');
+    });
+});
+
+            // Handle file input display
+            const fileInput = document.getElementById('recipeImage');
+            const fileNameDisplay = document.getElementById('selectedFileName');
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileNameDisplay.textContent = this.files[0].name;
+                } else {
+                    fileNameDisplay.textContent = 'Aucun fichier sélectionné';
+                }
             });
 
             // Close Modals
