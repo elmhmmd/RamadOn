@@ -29,11 +29,11 @@
             <h1 class="text-6xl font-display text-gold mb-6 gold-glow">Ramadan Moubarak 2025</h1>
             <p class="text-2xl text-light-gold mb-12">Partageons la magie du mois sacré ensemble</p>
             <div class="space-x-6">
-                <a href="{{ route('recettes.index')}}" 
+                <a href="{{ route('recettes.index') }}" 
                    class="inline-block border-2 border-gold text-light-gold px-8 py-4 rounded-lg font-display hover:bg-gold hover:text-olive transition duration-300">
                     Découvrir les Recettes
                 </a>
-                <a href="{{ route('temoignages.index')}}" 
+                <a href="{{ route('temoignages.index') }}" 
                    class="inline-block bg-gold text-light-gold px-8 py-4 rounded-lg font-display hover:bg-gold/90 transition duration-300">
                     Voir les Témoignages
                 </a>
@@ -53,7 +53,7 @@
                     soigneusement sélectionnées pour vos repas d'Iftar et Suhoor.
                 </p>
                 <div class="text-center">
-                    <a href="{{route('recettes.index')}}" 
+                    <a href="{{ route('recettes.index') }}" 
                        class="inline-block text-light-gold hover:text-gold transition duration-300 text-lg">
                         Explorer les recettes →
                     </a>
@@ -70,7 +70,7 @@
                     et partagez vos propres moments de spiritualité.
                 </p>
                 <div class="text-center">
-                    <a href="{{route('temoignages.index')}}" 
+                    <a href="{{ route('temoignages.index') }}" 
                        class="inline-block text-light-gold hover:text-gold transition duration-300 text-lg">
                         Lire les témoignages →
                     </a>
@@ -80,14 +80,22 @@
 
         <div class="mt-24 border border-gold/30 rounded-lg p-12">
             <h2 class="text-3xl font-display text-gold mb-12 text-center">Notre Communauté en Chiffres</h2>
-            <div class="grid md:grid-cols-2 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                 <div class="text-center">
-                    <p class="text-6xl font-display text-gold mb-4">{{ $totalRecettes ?? 0 }}</p>
+                    <p class="text-6xl font-display text-gold mb-4">{{ $recettesCount }}</p>
                     <p class="text-xl text-light-gold">Recettes Partagées</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-6xl font-display text-gold mb-4">{{ $totalTemoignages ?? 0 }}</p>
+                    <p class="text-6xl font-display text-gold mb-4">{{ $temoignagesCount }}</p>
                     <p class="text-xl text-light-gold">Témoignages Publiés</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-display text-gold mb-4">{{ $popularRecette }}</p>
+                    <p class="text-xl text-light-gold">Recette la Plus Populaire</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-3xl font-display text-gold mb-4">{{ $popularTemoignage }}</p>
+                    <p class="text-xl text-light-gold">Témoignage le Plus Populaire</p>
                 </div>
             </div>
         </div>
