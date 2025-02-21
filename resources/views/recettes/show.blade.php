@@ -73,12 +73,10 @@
             </div>
             @endif
 
-            <!-- Recipe Content -->
-            <div class="prose prose-lg max-w-none">
-                <div class="text-light-gold leading-relaxed whitespace-pre-line">
-                    {{ $recette->content }}
-                </div>
-            </div>
+            
+            <div class="max-w-3xl mx-auto text-light-gold leading-relaxed break-words whitespace-pre-wrap">
+    {{ $recette->content }}
+</div>
 
             <!-- Comments Section -->
             <div class="mt-16">

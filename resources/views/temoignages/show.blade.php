@@ -55,18 +55,11 @@
             </div>
             @endif
 
-            <div class="prose prose-lg max-w-none">
-                <div class="text-light-gold leading-relaxed whitespace-pre-line">
-                    {{ $temoignage->content }}
-                </div>
-            </div>
+            <div class="max-w-3xl mx-auto text-light-gold leading-relaxed break-words whitespace-pre-wrap">
+    {{ $temoignage->content }}
+</div>
 
-            <div class="flex justify-end space-x-4 mt-12">
-                <a href="/temoignages/{{ $temoignage->id }}/edit" class="golden-button px-6 py-2 text-olive rounded-full transition-all flex items-center gap-2">
-                    <i class="fas fa-edit"></i>
-                    <span>Modifier</span>
-                </a>
-            </div>
+
 
             <div class="mt-16">
                 <h2 class="text-2xl font-display text-gold mb-6">Commentaires</h2>
