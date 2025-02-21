@@ -11,6 +11,6 @@ class Temoignage extends Model
     public function comments()
 
     {
-        return $this->morphMany(Commentaire ::class, 'commentable');
+        return $this->morphMany(Comment ::class, 'commentable');
     }
 }

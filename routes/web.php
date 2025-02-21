@@ -2,11 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RecetteController;
+use App\Http\Controllers\TemoignagesController;
 
 
-Route::get('/', function () {
-    return view('Homepage');
-});
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/recettes', [RecetteController::class, 'index'])->name('recettes.index');
 
@@ -21,6 +20,13 @@ Route::post('/recettes', [RecetteController::class, 'store'])->name('recettes.st
 Route::post('/recettes/{id}', [RecetteController::class, 'update'])->name('recettes.update');
 
 Route::post('/recettes/{id}/comments', [RecetteController::class, 'storeComment'])->name('recettes.comments.store');
+
+
+Route::get('/temoignages/{id}', [TemoignagesController::class, 'show'])->name('temoignages.show');
+Route::post('/temoignages', [TemoignagesController::class, 'store'])->name('temoignages.store');
+Route::post('/temoignages/{id}', [TemoignagesController::class, 'update'])->name('temoignages.update');
+Route::delete('/temoignages/{id}', [TemoignagesController::class, 'destroy'])->name('temoignages.destroy');
+Route::post('/temoignages/{id}/comments', [TemoignagesController::class, 'storeComment'])->name('temoignages.comments.store');
 
 
 
