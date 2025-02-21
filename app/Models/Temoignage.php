@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Temoignage extends Model
 {
-    //
+    
+
+    public function comments()
+
+    {
+        return $this->morphMany(Commentaire ::class, 'commentable');
+    }
 }

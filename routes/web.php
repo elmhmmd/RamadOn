@@ -18,5 +18,9 @@ Route::delete('/recettes/{id}', [RecetteController::class, 'destroy'])->name('re
 
 Route::post('/recettes', [RecetteController::class, 'store'])->name('recettes.store');
 
+Route::post('/recettes/{id}', [RecetteController::class, 'update'])->name('recettes.update');
+
+Route::post('/recettes/{id}/comments', [RecetteController::class, 'storeComment'])->name('recettes.comments.store');
+
 
 

@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Replace the existing confirmation modal content with this: -->
+   
 <div id="confirmModal" class="modal">
     <div class="modal-content max-w-md">
         <h2 class="font-display text-gold text-xl mb-6">Confirmation</h2>
@@ -259,28 +259,27 @@
     const categoryFilters = document.querySelectorAll('.category-filter');
     const addRecipeBtn = document.getElementById('addRecipeBtn');
     
-    // Declare currentRecipeId at the top level scope
+    
     let currentRecipeId;
 
-    // CSRF token setup
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    // Filter functionality
+    
     function filterRecipes(selectedCategory) {
-        // Reset all buttons to inactive state
+        
         document.querySelectorAll('.category-filter').forEach(btn => {
             btn.classList.remove('active', 'bg-gold', 'text-olive');
             btn.classList.add('text-light-gold');
         });
 
-        // Activate only the clicked button
+        
         const activeButton = document.querySelector(`.category-filter[data-category="${selectedCategory}"]`);
         if (activeButton) {
             activeButton.classList.add('active', 'bg-gold', 'text-olive');
             activeButton.classList.remove('text-light-gold');
         }
 
-        // Show/hide recipes
+       
         document.querySelectorAll('.recipe-card').forEach(recipe => {
             if (selectedCategory === 'all' || recipe.dataset.category === selectedCategory) {
                 recipe.classList.remove('hidden');
@@ -290,7 +289,7 @@
         });
     }
 
-    // Add click handlers to filter buttons
+    
     document.querySelectorAll('.category-filter').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const category = e.currentTarget.dataset.category;
@@ -356,7 +355,7 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
         console.log('Response status:', response.status);
         console.log('Response headers:', [...response.headers.entries()]);
         
-        // Clone the response so we can both read the text and still parse as JSON if valid
+       
         return response.text().then(text => {
             console.log('Response text:', text);
             
@@ -365,7 +364,7 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
             }
             
             try {
-                // Try to parse as JSON if possible
+                
                 return JSON.parse(text);
             } catch (e) {
                 console.error('Failed to parse response as JSON:', e);
@@ -394,35 +393,37 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
 
     // Edit Recipe
     document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            // Store the current recipe ID in the same variable
-            currentRecipeId = e.target.closest('.recipe-card').dataset.id;
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentRecipeId = e.target.closest('.recipe-card').dataset.id;
 
-            fetch(`/recettes/${currentRecipeId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Update modal title
-                    document.getElementById('editModalTitle').textContent = 'Modifier la recette';
-
-                    // Fill form with existing data
-                    document.getElementById('recipeId').value = data.id;
-                    document.getElementById('recipeName').value = data.name;
-                    document.getElementById('recipeCategory').value = data.category_id;
-                    document.getElementById('recipeContent').value = data.content;
-
-                    // Reset file input display
-                    document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
-
-                    // Show the modal
-                    editRecipeModal.style.display = 'block';
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Erreur lors du chargement de la recette');
-                });
-        });
+        fetch(`/recettes/${currentRecipeId}`, {
+            headers: {
+                'Accept': 'application/json' // Explicitly request JSON
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Erreur HTTP ! Statut : ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Fetched recipe data:', data); // For debugging
+                document.getElementById('editModalTitle').textContent = 'Modifier la recette';
+                document.getElementById('recipeId').value = data.id || '';
+                document.getElementById('recipeName').value = data.name || '';
+                document.getElementById('recipeCategory').value = data.category_id || '';
+                document.getElementById('recipeContent').value = data.content || '';
+                document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                document.getElementById('editRecipeModal').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Erreur lors de la récupération de la recette:', error);
+                alert('Erreur lors du chargement de la recette : ' + error.message);
+            });
     });
+});
 
     // Add Recipe
     addRecipeBtn.addEventListener('click', () => {
@@ -434,7 +435,7 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
         editRecipeModal.style.display = 'block';
     });
 
-    document.getElementById('recipeForm').addEventListener('submit', (e) => {
+    /*document.getElementById('recipeForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
         const recipeId = formData.get('id');
@@ -474,7 +475,7 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
             console.error('Error:', error);
             alert('Erreur lors de l\'enregistrement de la recette');
         });
-    });
+    });*/
 
     // Handle file input display
     const fileInput = document.getElementById('recipeImage');
@@ -513,6 +514,198 @@ document.getElementById('confirmDelete').addEventListener('click', function() {
     // Initialize with "all" filter active
     filterRecipes('all');
 });
+
+/*document.getElementById('recipeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    let formData = new FormData(this);
+
+    fetch('/recettes', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Create a new recipe card
+            const newRecipe = document.createElement('div');
+            newRecipe.classList.add('recipe-card', 'bg-olive', 'border', 'border-gold/30', 'rounded-lg', 'overflow-hidden', 'hover:border-gold', 'transition-all');
+            newRecipe.dataset.category = data.recette.category_id;
+            newRecipe.dataset.id = data.recette.id;
+
+            newRecipe.innerHTML = `
+                <div class="p-6">
+                    <span class="text-light-gold text-sm uppercase tracking-wider">${document.querySelector(`#recipeCategory option[value="${data.recette.category_id}"]`).textContent}</span>
+                    <h3 class="font-display text-gold text-xl mt-2 mb-4">${data.recette.name}</h3>
+                    <div class="flex flex-col space-y-4">
+                        <a href="/recettes/${data.recette.id}" class="w-full block">
+                            <button class="voir-recette-btn w-full px-4 py-2 border border-gold/30 rounded-full text-light-gold hover:text-gold hover:border-gold transition-all">
+                                Voir Recette →
+                            </button>
+                        </a>
+                        <div class="flex justify-end space-x-2">
+                            <button class="edit-btn p-2 text-light-gold hover:text-gold transition-all">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="delete-btn p-2 text-light-gold hover:text-gold transition-all">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('recipeGrid').appendChild(newRecipe);
+            document.getElementById('editRecipeModal').style.display = 'none';
+
+            alert('Recette ajoutée avec succès!');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Erreur lors de l’ajout de la recette.');
+    });
+});*/
+
+document.getElementById('recipeForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    let formData = new FormData(this);
+    const recipeId = formData.get('id');
+    const isEditing = recipeId !== '';
+    const url = isEditing ? `/recettes/${recipeId}` : '/recettes';
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    // Remove this block since POST is sufficient
+    // if (isEditing) {
+    //     formData.append('_method', 'PUT');
+    // }
+
+    if (isEditing && !formData.get('image').size) {
+        formData.delete('image');
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': csrfToken,
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`Erreur lors de la requête: ${response.status} - ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            if (isEditing) {
+                const existingCard = document.querySelector(`.recipe-card[data-id="${recipeId}"]`);
+                if (existingCard) {
+                    const categorySpan = existingCard.querySelector('.text-light-gold.text-sm');
+                    categorySpan.textContent = document.querySelector(`#recipeCategory option[value="${data.recette.category_id}"]`).textContent;
+                    const title = existingCard.querySelector('.font-display');
+                    title.textContent = data.recette.name;
+                    const viewButton = existingCard.querySelector('.voir-recette-btn');
+                    viewButton.parentElement.href = `/recettes/${data.recette.id}`;
+                } else {
+                    console.warn(`Recipe card with ID ${recipeId} not found for update`);
+                }
+                alert('Recette modifiée avec succès!');
+            } else {
+                const newRecipe = document.createElement('div');
+                newRecipe.classList.add('recipe-card', 'bg-olive', 'border', 'border-gold/30', 'rounded-lg', 'overflow-hidden', 'hover:border-gold', 'transition-all');
+                newRecipe.dataset.category = data.recette.category_id;
+                newRecipe.dataset.id = data.recette.id;
+
+                newRecipe.innerHTML = `
+                    <div class="p-6">
+                        <span class="text-light-gold text-sm uppercase tracking-wider">${document.querySelector(`#recipeCategory option[value="${data.recette.category_id}"]`).textContent}</span>
+                        <h3 class="font-display text-gold text-xl mt-2 mb-4">${data.recette.name}</h3>
+                        <div class="flex flex-col space-y-4">
+                            <a href="/recettes/${data.recette.id}" class="w-full block">
+                                <button class="voir-recette-btn w-full px-4 py-2 border border-gold/30 rounded-full text-light-gold hover:text-gold hover:border-gold transition-all">
+                                    Voir Recette →
+                                </button>
+                            </a>
+                            <div class="flex justify-end space-x-2">
+                                <button class="edit-btn p-2 text-light-gold hover:text-gold transition-all">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="delete-btn p-2 text-light-gold hover:text-gold transition-all">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('recipeGrid').appendChild(newRecipe);
+                alert('Recette ajoutée avec succès!');
+
+                newRecipe.querySelector('.voir-recette-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    fetch(`/recettes/${data.recette.id}`, { headers: { 'Accept': 'application/json' } })
+                        .then(res => res.json())
+                        .then(recipeData => {
+                            document.getElementById('modalTitle').textContent = recipeData.name;
+                            document.getElementById('modalCategory').textContent = recipeData.category.name;
+                            const ingredientsList = document.getElementById('modalIngredients');
+                            ingredientsList.innerHTML = '';
+                            recipeData.content.split('\n').forEach(ingredient => {
+                                if (ingredient.trim()) {
+                                    const li = document.createElement('li');
+                                    li.textContent = ingredient.trim();
+                                    ingredientsList.appendChild(li);
+                                }
+                            });
+                            document.getElementById('modalContent').textContent = recipeData.content;
+                            document.getElementById('recipeModal').style.display = 'block';
+                        });
+                });
+
+                newRecipe.querySelector('.edit-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    currentRecipeId = data.recette.id;
+                    fetch(`/recettes/${currentRecipeId}`, { headers: { 'Accept': 'application/json' } })
+                        .then(res => res.json())
+                        .then(recipeData => {
+                            document.getElementById('editModalTitle').textContent = 'Modifier la recette';
+                            document.getElementById('recipeId').value = recipeData.id;
+                            document.getElementById('recipeName').value = recipeData.name;
+                            document.getElementById('recipeCategory').value = recipeData.category_id;
+                            document.getElementById('recipeContent').value = recipeData.content;
+                            document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
+                            document.getElementById('editRecipeModal').style.display = 'block';
+                        });
+                });
+
+                newRecipe.querySelector('.delete-btn').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    currentRecipeId = data.recette.id;
+                    document.getElementById('confirmModal').style.display = 'block';
+                });
+            }
+
+            document.getElementById('editRecipeModal').style.display = 'none';
+            const activeCategory = document.querySelector('.category-filter.active')?.dataset.category || 'all';
+            filterRecipes(activeCategory);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert(`Erreur lors de ${isEditing ? 'la modification' : 'l’ajout'} de la recette: ${error.message}`);
+    });
+});
+
 </script>
 </body>
 </html>

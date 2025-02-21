@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $recette->name }} - RamadOn</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
@@ -66,7 +67,7 @@
             <!-- Recipe Image (if exists) -->
             @if($recette->image)
             <div class="mb-12 rounded-lg overflow-hidden border border-gold/30">
-                <img src="{{ asset('storage/images/' . $recette->image) }}" 
+                <img src="{{ asset('storage/' . $recette->image) }}" 
                      alt="{{ $recette->name }}" 
                      class="w-full h-auto">
             </div>
@@ -79,13 +80,59 @@
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-4 mt-12">
-                <a href="/recettes/{{ $recette->id }}/edit" 
-                   class="golden-button px-6 py-2 text-olive rounded-full transition-all flex items-center gap-2">
-                    <i class="fas fa-edit"></i>
-                    <span>Modifier</span>
-                </a>
+            <!-- Comments Section -->
+            <div class="mt-16">
+                <h2 class="text-2xl font-display text-gold mb-6">Commentaires</h2>
+
+                <!-- Success Message -->
+                @if(session('success'))
+                    <div class="bg-green-500/20 border border-green-500 text-light-gold p-4 rounded-lg mb-6">
+                        {{ session('success') }}
+                    </div>
+                @endif
+
+                <!-- Display Comments -->
+                @if($recette->comments->isEmpty())
+                    <p class="text-light-gold">Aucun commentaire pour le moment.</p>
+                @else
+                    <div class="space-y-6">
+                        @foreach($recette->comments as $comment)
+                            <div class="border border-gold/30 p-4 rounded-lg">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-light-gold font-semibold">
+                                        {{ $comment->auteur }}
+                                    </span>
+                                    <span class="text-light-gold text-sm">
+                                        {{ $comment->created_at->format('d/m/Y H:i') }}
+                                    </span>
+                                </div>
+                                <p class="text-light-gold">{{ $comment->content }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+
+                <!-- Comment Form -->
+                <form action="{{ route('recettes.comments.store', $recette->id) }}" method="POST" class="mt-8 space-y-4">
+                    @csrf
+                    <div>
+                        <label for="auteur" class="block text-light-gold mb-2">Votre nom</label>
+                        <input type="text" id="auteur" name="auteur" 
+                               class="w-full p-3 rounded-lg bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" 
+                               placeholder="Entrez votre nom" required>
+                    </div>
+                    <div>
+                        <label for="content" class="block text-light-gold mb-2">Votre commentaire</label>
+                        <textarea id="content" name="content" rows="4" 
+                                  class="w-full p-3 rounded-lg bg-olive border border-gold/50 text-gold focus:border-gold focus:outline-none" 
+                                  placeholder="Écrivez votre commentaire ici..." required></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="golden-button px-6 py-2 text-olive rounded-full transition-all flex items-center gap-2">
+                        <i class="fas fa-comment"></i>
+                        <span>Publier</span>
+                    </button>
+                </form>
             </div>
         </div>
     </main>
