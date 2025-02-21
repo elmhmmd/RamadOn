@@ -300,135 +300,134 @@
             updateActiveFilter(category);
         });
 
-        // Initial load defaults to 'all'
-        const initialCategory = '{{ $category ?? 'all' }}';
-        loadRecipes(initialCategory);
-        updateActiveFilter(initialCategory);
-        updateUrl(initialCategory);
+        // Explicitly set initial load to 'all' to ensure default state
+        loadRecipes('all');
+        updateActiveFilter('all');
+        updateUrl('all');
+    });
 
-        function viewRecipe(e) {
-            e.stopPropagation();
-            const recipeId = e.target.closest('.recipe-card').dataset.id;
-            fetch(`/recettes/${recipeId}`, { headers: { 'Accept': 'application/json' } })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('modalTitle').textContent = data.name;
-                    document.getElementById('modalCategory').textContent = data.category.name;
-                    const ingredientsList = document.getElementById('modalIngredients');
-                    ingredientsList.innerHTML = '';
-                    data.content.split('\n').forEach(ingredient => {
-                        if (ingredient.trim()) {
-                            const li = document.createElement('li');
-                            li.textContent = ingredient.trim();
-                            ingredientsList.appendChild(li);
-                        }
-                    });
-                    document.getElementById('modalContent').textContent = data.content;
-                    recipeModal.style.display = 'block';
-                });
-        }
-
-        function editRecipe(e) {
-            e.stopPropagation();
-            currentRecipeId = e.target.closest('.recipe-card').dataset.id;
-            fetch(`/recettes/${currentRecipeId}`, { headers: { 'Accept': 'application/json' } })
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('editModalTitle').textContent = 'Modifier la recette';
-                    document.getElementById('recipeId').value = data.id || '';
-                    document.getElementById('recipeName').value = data.name || '';
-                    document.getElementById('recipeCategory').value = data.category_id || '';
-                    document.getElementById('recipeContent').value = data.content || '';
-                    document.getElementById('selectedFileName').textContent = 'Aucun fichier sélectionné';
-                    editRecipeModal.style.display = 'block';
-                })
-                .catch(error => alert('Erreur lors du chargement: ' + error.message));
-        }
-
-        function deleteRecipe(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            currentRecipeId = e.target.closest('.recipe-card').dataset.id;
-            confirmModal.style.display = 'block';
-        }
-
-        addRecipeBtn.addEventListener('click', () => {
-            document.getElementById('editModalTitle').textContent = 'Ajouter une recette';
-            document.getElementById('recipeForm').reset();
-            document.getElementById('recipeId').value = '';
-            currentRecipeId = null;
-            editRecipeModal.style.display = 'block';
-        });
-
-        document.getElementById('recipeForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            const recipeId = formData.get('id');
-            const isEditing = recipeId !== '';
-            const url = isEditing ? `/recettes/${recipeId}` : '/recettes';
-
-            if (isEditing && !formData.get('image').size) {
-                formData.delete('image');
-            }
-
-            fetch(url, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) throw new Error('Erreur de sauvegarde');
-                return response.json();
-            })
-            .then(data => {
-                editRecipeModal.style.display = 'none';
-                alert(isEditing ? 'Recette modifiée avec succès!' : 'Recette ajoutée avec succès!');
-                const activeCategory = document.querySelector('.category-filter.active')?.dataset.category || 'all';
-                loadRecipes(activeCategory);
-            })
-            .catch(error => alert('Erreur lors de l\'enregistrement: ' + error.message));
-        });
-
-        document.getElementById('confirmDelete').addEventListener('click', () => {
-            fetch(`/recettes/${currentRecipeId}`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
-            })
+    function viewRecipe(e) {
+        e.stopPropagation();
+        const recipeId = e.target.closest('.recipe-card').dataset.id;
+        fetch(`/recettes/${recipeId}`, { headers: { 'Accept': 'application/json' } })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    document.querySelector(`.recipe-card[data-id="${currentRecipeId}"]`)?.remove();
-                    confirmModal.style.display = 'none';
-                    alert('Recette supprimée avec succès');
-                }
-            })
-            .catch(error => alert('Erreur lors de la suppression: ' + error.message));
-        });
-
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', () => {
-                recipeModal.style.display = 'none';
-                editRecipeModal.style.display = 'none';
-                confirmModal.style.display = 'none';
+                document.getElementById('modalTitle').textContent = data.name;
+                document.getElementById('modalCategory').textContent = data.category.name;
+                const ingredientsList = document.getElementById('modalIngredients');
+                ingredientsList.innerHTML = '';
+                data.content.split('\n').forEach(ingredient => {
+                    if (ingredient.trim()) {
+                        const li = document.createElement('li');
+                        li.textContent = ingredient.trim();
+                        ingredientsList.appendChild(li);
+                    }
+                });
+                document.getElementById('modalContent').textContent = data.content;
+                recipeModal.style.display = 'block';
             });
-        });
+    }
 
-        document.getElementById('cancelDelete').addEventListener('click', () => {
+    function editRecipe(e) {
+        e.stopPropagation();
+        currentRecipeId = e.target.closest('.recipe-card').dataset.id;
+        fetch(`/recettes/${currentRecipeId}`, { headers: { 'Accept': 'application/json' } })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editModalTitle').textContent = 'Modifier la recette';
+                document.getElementById('recipeId').value = data.id || '';
+                document.getElementById('recipeName').value = data.name || '';
+                document.getElementById('recipeCategory').value = data.category_id || '';
+                document.getElementById('recipeContent').value = data.content || '';
+                document.getElementById('selectedFileName').textContent = 'Aucune image sélectionnée';
+                editRecipeModal.style.display = 'block';
+            })
+            .catch(error => alert('Erreur lors du chargement: ' + error.message));
+    }
+
+    function deleteRecipe(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        currentRecipeId = e.target.closest('.recipe-card').dataset.id;
+        confirmModal.style.display = 'block';
+    }
+
+    addRecipeBtn.addEventListener('click', () => {
+        document.getElementById('editModalTitle').textContent = 'Ajouter une recette';
+        document.getElementById('recipeForm').reset();
+        document.getElementById('recipeId').value = '';
+        currentRecipeId = null;
+        editRecipeModal.style.display = 'block';
+    });
+
+    document.getElementById('recipeForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const recipeId = formData.get('id');
+        const isEditing = recipeId !== '';
+        const url = isEditing ? `/recettes/${recipeId}` : '/recettes';
+
+        if (isEditing && !formData.get('image').size) {
+            formData.delete('image');
+        }
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error('Erreur de sauvegarde');
+            return response.json();
+        })
+        .then(data => {
+            editRecipeModal.style.display = 'none';
+            alert(isEditing ? 'Recette modifiée avec succès!' : 'Recette ajoutée avec succès!');
+            const activeCategory = document.querySelector('.category-filter.active')?.dataset.category || 'all';
+            loadRecipes(activeCategory);
+        })
+        .catch(error => alert('Erreur lors de l\'enregistrement: ' + error.message));
+    });
+
+    document.getElementById('confirmDelete').addEventListener('click', () => {
+        fetch(`/recettes/${currentRecipeId}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelector(`.recipe-card[data-id="${currentRecipeId}"]`)?.remove();
+                confirmModal.style.display = 'none';
+                alert('Recette supprimée avec succès');
+            }
+        })
+        .catch(error => alert('Erreur lors de la suppression: ' + error.message));
+    });
+
+    document.querySelectorAll('.close-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            recipeModal.style.display = 'none';
+            editRecipeModal.style.display = 'none';
             confirmModal.style.display = 'none';
         });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === recipeModal || e.target === editRecipeModal || e.target === confirmModal) {
-                recipeModal.style.display = 'none';
-                editRecipeModal.style.display = 'none';
-                confirmModal.style.display = 'none';
-            }
-        });
-
-        document.getElementById('recipeImage').addEventListener('change', function() {
-            document.getElementById('selectedFileName').textContent = this.files.length > 0 ? this.files[0].name : 'Aucun fichier sélectionné';
-        });
     });
+
+    document.getElementById('cancelDelete').addEventListener('click', () => {
+        confirmModal.style.display = 'none';
+    });
+
+    window.addEventListener('click', (e) => {
+        if (e.target === recipeModal || e.target === editRecipeModal || e.target === confirmModal) {
+            recipeModal.style.display = 'none';
+            editRecipeModal.style.display = 'none';
+            confirmModal.style.display = 'none';
+        }
+    });
+
+    document.getElementById('recipeImage').addEventListener('change', function() {
+        document.getElementById('selectedFileName').textContent = this.files.length > 0 ? this.files[0].name : 'Aucun fichier sélectionné';
+    }); 
     </script>
 </body>
 </html>
