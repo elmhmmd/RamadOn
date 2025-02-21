@@ -6,17 +6,36 @@ use Illuminate\Http\Request;
 use App\Models\Recette;
 use App\Models\Category;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Log;
 //use Illuminate\Support\Facades\Storage;
 
 class RecetteController extends Controller
 {
-    public function index()
-    {
-        $categories = Category::all();
-        $recettes = Recette::all();
-        return view('recettes.index', compact('categories', 'recettes'));
+    public function index(Request $request, $category = null)
+{
+    $categories = Category::all();
+
+    if ($request->wantsJson()) {
+        \Log::info("Filtering recipes for category: " . ($category ?? 'all'));
+        $query = Recette::with('category');
+        if ($category && $category !== 'all') {
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->whereRaw('TRIM(LOWER(name)) = ?', [trim(strtolower($category))]);
+            });
+        }
+        $recettes = $query->get();
+        \Log::info("Found recipes: " . $recettes->count());
+        return response()->json($recettes);
     }
 
+    $recettes = $category && $category !== 'all'
+        ? Recette::whereHas('category', function ($q) use ($category) {
+            $q->whereRaw('TRIM(LOWER(name)) = ?', [trim(strtolower($category))]);
+        })->get()
+        : Recette::all();
+
+    return view('recettes.index', compact('categories', 'recettes', 'category'));
+}
     public function destroy($id)
     {
         try {
@@ -62,15 +81,6 @@ class RecetteController extends Controller
         }
     }
 
-   /* public function show($id)
-{
-    try {
-        $recette = Recette::with('category')->findOrFail($id);
-        return view('recettes.show', compact('recette'));
-    } catch (\Exception $e) {
-        abort(404, 'Recette not found');
-    }
-}*/
 
 public function store(Request $request)
 {
@@ -149,30 +159,4 @@ public function storeComment(Request $request, $id)
 
 }
 
-    /*public function update(Request $request, $id)
-{
-    $recette = Recette::findOrFail($id);
-    
-    $validated = $request->validate([
-        'name' => 'required|string|max:255',
-        'category_id' => 'required|exists:categories,id',
-        'content' => 'required|string',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-    ]);
-
-    if ($request->hasFile('image')) {
-        // Delete old image if exists
-        if ($recette->image) {
-            Storage::delete('public/images/' . $recette->image);
-        }
-        
-        // Store new image
-        $imagePath = $request->file('image')->store('public/images');
-        $validated['image'] = basename($imagePath);
-    }
-
-    $recette->update($validated);
-
-    return response()->json(['message' => 'Recipe updated successfully']);
-}*/
 
